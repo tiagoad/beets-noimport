@@ -3,3 +3,5 @@ Thumbs.db
 *.egg-info
 *.pyc
 .idea
+dist
+build

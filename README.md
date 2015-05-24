@@ -1,7 +1,7 @@
 beets-noimport
 ==============
 
-Adds directories to the incremental import "do not import" list
+Adds directories to the incremental import skip list
 
 Install
 -------
@@ -23,6 +23,13 @@ To add all the directories in your current directory, run
 ```
 $ beet noimport .
 Added 384 paths to the skip list
+```
+
+To do the reverse (remove the paths from the skip list), run the command with the `-r` or `--reverse` option
+
+```
+$ beet -r noimport .
+Removed 384 paths from the skip list
 ```
 
 License

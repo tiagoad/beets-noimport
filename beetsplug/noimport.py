@@ -1,5 +1,5 @@
 """
-add directories to the incremental import "do not import" list
+add directories to the incremental import skip list
 """
 
 import logging
@@ -17,7 +17,12 @@ class NoImportPlugin(plugins.BeetsPlugin):
 
         self._command = ui.Subcommand(
             'noimport',
-            help='add directories to the incremental import "do not import" list')
+            help='add directories to the incremental import skip list')
+
+        self._command.parser.add_option(
+            '-r', '--reverse', action='store_true', dest='reverse', default=None,
+            help="remove directories from the skip list"
+        )
 
     def commands(self):
         def func(lib, opts, args):
@@ -26,12 +31,12 @@ class NoImportPlugin(plugins.BeetsPlugin):
             if not paths:
                 raise ui.UserError('no path specified')
 
-            self.noimport_files(lib, paths)
+            self.noimport_files(lib, paths, opts)
 
         self._command.func = func
         return [self._command]
 
-    def noimport_files(self, lib, paths):
+    def noimport_files(self, lib, paths, opts):
         # Check the user-specified directories.
         for path in paths:
             if not os.path.exists(syspath(normpath(path))):
@@ -50,13 +55,22 @@ class NoImportPlugin(plugins.BeetsPlugin):
             added = 0
             # ...get the list of albums in that path...
             for dirs, paths_in_dir in importer.albums_in_dir(path):
+                dirs_tuple = tuple(map(normpath, dirs))
+
                 # ...check if they're not already in the 'taghistory' set
-                if tuple(dirs) not in state['taghistory']:
-                    # ...and add them...
-                    state['taghistory'].add(tuple(map(normpath, dirs)))
+                if not opts.reverse:
+                    if dirs_tuple not in state['taghistory']:
+                        state['taghistory'].add(dirs_tuple)
+                        added += 1
+
+                elif dirs_tuple in state['taghistory']:
+                    state['taghistory'].remove(dirs_tuple)
                     added += 1
 
         # Save the state file
         importer._save_state(state)
 
-        log.info(u'Added {0} paths to the skip list', added)
+        if not opts.reverse:
+            log.info(u'Added {0} paths to the skip list', added)
+        else:
+            log.info(u'Removed {0} paths from the skip list', added)

@@ -53,7 +53,7 @@ class NoImportPlugin(plugins.BeetsPlugin):
                 # ...check if they're not already in the 'taghistory' set
                 if tuple(dirs) not in state['taghistory']:
                     # ...and add them...
-                    state['taghistory'].add(tuple(dirs))
+                    state['taghistory'].add(tuple(map(normpath, dirs)))
                     added += 1
 
         # Save the state file

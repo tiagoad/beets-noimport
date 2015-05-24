@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='beets-noimport',
-    version='0.1.0b3',
+    version='0.1.0b4',
     description='add directories to the incremental import "do not import" list',
     long_description=open('README.md').read(),
     author='Tiago Dias',
